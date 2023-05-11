@@ -156,7 +156,8 @@ const makeImageRequestParam = (
 ): CreateImageRequest => {
   // Set default values
   const defaultOptions: Omit<CreateImageRequest, "prompt"> = {
-    n: useAppConfig.getState().imageModelConfig.noOfImage,
+    n: 4,
+    size: CreateImageRequestSizeEnum._512x512,
     response_format: CreateImageRequestResponseFormatEnum.Url,
     user: "default_user",
   };

@@ -557,7 +557,6 @@ export function Chat() {
 
   const accessStore = useAccessStore();
 
-  console.log(session);
   if (
     context.length === 0 &&
     session.messages.at(0)?.content !== session.botHello.content
