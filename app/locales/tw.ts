@@ -158,6 +158,7 @@ const tw: LocaleType = {
       Model: "DALL-E模型",
       Command: "生成圖片指令",
       NoOfImage: "圖片生成次數限制",
+      CountLimit: "圖片生成次數限制",
       Size: "圖片生成尺寸",
     },
     Temperature: {

@@ -160,6 +160,7 @@ const vi: LocaleType = {
       Model: "Mô hình DALL-E",
       Command: "Lệnh tạo hình ảnh",
       NoOfImage: "Giới hạn số lượng hình ảnh tạo ra",
+      CountLimit: "Giới hạn số lượng hình ảnh tạo ra",
       Size: "Kích thước hình ảnh được tạo ra",
     },
     Temperature: {

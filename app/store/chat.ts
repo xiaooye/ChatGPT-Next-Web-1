@@ -289,8 +289,15 @@ export const useChatStore = create<ChatStore>()(
           session.messages.push(botMessage);
         });
 
-        if (userMessage.content.startsWith("/image")) {
-          const keyword = userMessage.content.substring("/image".length);
+        if (
+          userMessage.content
+            .trim()
+            .toLowerCase()
+            .startsWith(imageModelConfig.command.toLowerCase())
+        ) {
+          const keyword = userMessage.content.substring(
+            imageModelConfig.command.toLowerCase().length,
+          );
           console.log("keyword", keyword);
           requestImage(keyword, {
             onMessage(content, images, image_alt, done) {

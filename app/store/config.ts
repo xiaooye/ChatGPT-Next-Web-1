@@ -42,6 +42,7 @@ export const DEFAULT_CONFIG = {
   },
   imageModelConfig: {
     noOfImage: 1,
+    imageLimit: 1,
     command: COMMAND_IMAGE,
     size: "256x256" as ImageRequestSizeEnum,
   },

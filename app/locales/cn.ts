@@ -160,6 +160,7 @@ const cn = {
       Model: "DALL-E模型",
       Command: "生成图片指令",
       NoOfImage: "图片生成次数限制",
+      CountLimit: "图片生成次数限制",
       Size: "图片生成尺寸",
     },
     Temperature: {
@@ -178,6 +179,7 @@ const cn = {
   Store: {
     DefaultTopic: "新的聊天",
     botHello: "您好！今天我能为您做些什么呢？",
+    BotHello: "您好！今天我能为您做些什么呢？",
     BotHelloWithCommand: (command: string) =>
       "您好！今天我能为您做些什么呢？\n 要生成图片，请使用 `" +
       command +
