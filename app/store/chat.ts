@@ -1,8 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-<<<<<<< HEAD
-=======
 import {
   ImagesResponseDataInner,
   type ChatCompletionResponseMessage,
@@ -13,7 +11,6 @@ import {
   requestImage,
   requestWithPrompt,
 } from "../requests";
->>>>>>> 3e8fad0 (Add support for DALL-E #1358)
 import { trimTopic } from "../utils";
 
 import Locale from "../locales";
@@ -61,17 +58,22 @@ export interface ChatSession {
   stat: ChatStat;
   lastUpdate: number;
   lastSummarizeIndex: number;
-
+  botHello: Message;
   mask: Mask;
 }
 
 export const DEFAULT_TOPIC = Locale.Store.DefaultTopic;
-export const BOT_HELLO: ChatMessage = createMessage({
+const BOT_HELLO: Message = createMessage({
   role: "assistant",
   content: Locale.Store.BotHello,
 });
+const createBotHelloWithCommand = (command: string): Message => {
+  BOT_HELLO.content = Locale.Store.BotHelloWithCommand(command);
+  return BOT_HELLO;
+};
 
 function createEmptySession(): ChatSession {
+  const mask = createEmptyMask();
   return {
     id: Date.now() + Math.random(),
     topic: DEFAULT_TOPIC,
@@ -84,7 +86,8 @@ function createEmptySession(): ChatSession {
     },
     lastUpdate: Date.now(),
     lastSummarizeIndex: 0,
-    mask: createEmptyMask(),
+    mask: mask,
+    botHello: createBotHelloWithCommand(mask.imageModelConfig.command),
   };
 }
 
@@ -249,6 +252,7 @@ export const useChatStore = create<ChatStore>()(
       async onUserInput(content) {
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
+        const imageModelConfig = session.mask.imageModelConfig;
 
         const userMessage: ChatMessage = createMessage({
           role: "user",
@@ -285,8 +289,15 @@ export const useChatStore = create<ChatStore>()(
           session.messages.push(botMessage);
         });
 
-        if (userMessage.content.startsWith("/image")) {
-          const keyword = userMessage.content.substring("/image".length);
+        if (
+          userMessage.content
+            .trim()
+            .toLowerCase()
+            .startsWith(imageModelConfig.command.toLowerCase())
+        ) {
+          const keyword = userMessage.content.substring(
+            imageModelConfig.command.toLowerCase().length,
+          );
           console.log("keyword", keyword);
           requestImage(keyword, {
             onMessage(content, images, image_alt, done) {

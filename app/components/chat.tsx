@@ -25,7 +25,6 @@ import {
   ChatMessage,
   SubmitKey,
   useChatStore,
-  BOT_HELLO,
   createMessage,
   useAccessStore,
   Theme,
@@ -558,11 +557,12 @@ export function Chat() {
 
   const accessStore = useAccessStore();
 
+  console.log(session);
   if (
     context.length === 0 &&
-    session.messages.at(0)?.content !== BOT_HELLO.content
+    session.messages.at(0)?.content !== session.botHello.content
   ) {
-    const copiedHello = Object.assign({}, BOT_HELLO);
+    const copiedHello = Object.assign({}, session.botHello);
     if (!accessStore.isAuthorized()) {
       copiedHello.content = Locale.Error.Unauthorized;
     }

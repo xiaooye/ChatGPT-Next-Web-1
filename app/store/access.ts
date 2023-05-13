@@ -73,9 +73,9 @@ export const useAccessStore = create<AccessControlStore>()(
               });
             }
 
-            if ((res as any).botHello) {
-              BOT_HELLO.content = (res as any).botHello;
-            }
+            // if ((res as any).botHello) {
+            //   BOT_HELLO.content = (res as any).botHello;
+            // }
           })
           .catch(() => {
             console.error("[Config] failed to fetch config");
