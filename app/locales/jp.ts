@@ -181,6 +181,7 @@ const jp: LocaleType = {
   },
   Store: {
     DefaultTopic: "新しいチャット",
+    botHello: "こんにちは、何かお手伝いできますか？",
     BotHello: "何かお手伝いできることはありますか",
     BotHelloWithCommand: (command: string) =>
       "何かお手伝いできることはありますか\n 画像を生成するには、`" +

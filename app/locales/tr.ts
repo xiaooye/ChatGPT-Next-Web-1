@@ -181,6 +181,7 @@ const tr: LocaleType = {
   },
   Store: {
     DefaultTopic: "Yeni Konuşma",
+    botHello: "Merhaba! Size bugün nasıl yardımcı olabilirim?",
     BotHello: "Merhaba! Size bugün nasıl yardımcı olabilirim?",
     BotHelloWithCommand: (command: string) =>
       "Merhaba! Size bugün nasıl yardımcı olabilirim?\n Resim oluşturmak için, `" +

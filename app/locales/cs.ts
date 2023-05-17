@@ -178,6 +178,7 @@ const cs: LocaleType = {
   },
   Store: {
     DefaultTopic: "Nová konverzace",
+    botHello: "Ahoj! Jak mohu dnes pomoci?",
     BotHello: "Ahoj! Jak mohu dnes pomoci?",
     BotHelloWithCommand: (command: string) =>
       "Ahoj! Jak mohu dnes pomoci?\n Pro generování obrázků použijte `" +

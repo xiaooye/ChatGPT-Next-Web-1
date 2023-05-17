@@ -175,6 +175,7 @@ const tw: LocaleType = {
   },
   Store: {
     DefaultTopic: "新的對話",
+    botHello: "請問需要我的協助嗎？",
     BotHello: "請問需要我的協助嗎？",
     BotHelloWithCommand: (command: string) =>
       "請問需要我的協助嗎？\n 若要生成圖片，請使用 `" + command + " {關鍵字}.`",

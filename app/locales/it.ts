@@ -180,6 +180,7 @@ const it: LocaleType = {
   },
   Store: {
     DefaultTopic: "Nuova conversazione",
+    botHello: "Ciao, come posso aiutarti oggi?",
     BotHello: "Ciao, come posso aiutarti oggi?",
     BotHelloWithCommand: (command: string) =>
       "Ciao, come posso aiutarti oggi?\n Per generare immagini, usa `" +

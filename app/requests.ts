@@ -1,6 +1,6 @@
 import type { ChatRequest, ChatResponse } from "./api/openai/typing";
 import {
-  Message,
+  ChatMessage,
   ModelConfig,
   ModelType,
   useAccessStore,
@@ -19,7 +19,7 @@ import {
 const TIME_OUT_MS = 60000;
 
 const makeRequestParam = (
-  messages: Message[],
+  messages: ChatMessage[],
   options?: {
     stream?: boolean;
     overrideModel?: ModelType;
@@ -82,7 +82,7 @@ export function requestOpenaiClient(path: string) {
 }
 
 export async function requestChat(
-  messages: Message[],
+  messages: ChatMessage[],
   options?: {
     model?: ModelType;
   },
@@ -238,7 +238,7 @@ export async function requestImage(
 }
 
 export async function requestChatStream(
-  messages: Message[],
+  messages: ChatMessage[],
   options?: {
     modelConfig?: ModelConfig;
     overrideModel?: ModelType;
@@ -319,7 +319,7 @@ export async function requestChatStream(
 }
 
 export async function requestWithPrompt(
-  messages: Message[],
+  messages: ChatMessage[],
   prompt: string,
   options?: {
     model?: ModelType;

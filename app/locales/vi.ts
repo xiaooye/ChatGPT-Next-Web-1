@@ -177,6 +177,7 @@ const vi: LocaleType = {
   },
   Store: {
     DefaultTopic: "Cuộc trò chuyện mới",
+    botHello: "Xin chào! Mình có thể giúp gì cho bạn?",
     BotHello: "Xin chào! Mình có thể giúp gì cho bạn?",
     BotHelloWithCommand: (command: string) =>
       "Xin chào! Mình có thể giúp gì cho bạn?\n Để tạo hình ảnh, hãy sử dụng `" +

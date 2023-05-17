@@ -58,16 +58,16 @@ export interface ChatSession {
   stat: ChatStat;
   lastUpdate: number;
   lastSummarizeIndex: number;
-  botHello: Message;
+  botHello: ChatMessage;
   mask: Mask;
 }
 
 export const DEFAULT_TOPIC = Locale.Store.DefaultTopic;
-const BOT_HELLO: Message = createMessage({
+const BOT_HELLO: ChatMessage = createMessage({
   role: "assistant",
   content: Locale.Store.BotHello,
 });
-const createBotHelloWithCommand = (command: string): Message => {
+const createBotHelloWithCommand = (command: string): ChatMessage => {
   BOT_HELLO.content = Locale.Store.BotHelloWithCommand(command);
   return BOT_HELLO;
 };
