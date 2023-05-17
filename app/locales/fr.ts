@@ -87,7 +87,6 @@ const fr: LocaleType = {
         cs: "Čeština",
       },
     },
-
     Avatar: "Avatar",
     FontSize: {
       Title: "Taille des polices",
@@ -160,6 +159,13 @@ const fr: LocaleType = {
       Placeholder: "Code d'accès requis",
     },
     Model: "Modèle",
+    ImageModel: {
+      Title: "Modèle d'image",
+      Model: "Modèle",
+      Command: "Commande",
+      NoOfImage: "Nombre d'images",
+      Size: "Taille",
+    },
     Temperature: {
       Title: "Température",
       SubTitle: "Une valeur plus élevée rendra les réponses plus aléatoires",
@@ -176,7 +182,10 @@ const fr: LocaleType = {
   },
   Store: {
     DefaultTopic: "Nouvelle conversation",
+    botHello: "Bonjour ! Comment puis-je vous aider aujourd'hui ?",
     BotHello: "Bonjour ! Comment puis-je vous aider aujourd'hui ?",
+    BotHelloWithCommand: (command: string) =>
+      `Bonjour ! Comment puis-je vous aider aujourd'hui ? (Commande : ${command})`,
     Error: "Quelque chose s'est mal passé, veuillez réessayer plus tard.",
     Prompt: {
       History: (content: string) =>
