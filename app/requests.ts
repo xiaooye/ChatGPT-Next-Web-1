@@ -293,8 +293,30 @@ export async function requestChatStream(
           break;
         }
 
-        const text = decoder.decode(content.value, { stream: true });
-        responseText += text;
+        const text = decoder
+          .decode(content.value, { stream: true })
+          .toString()
+          .split("\n")
+          .filter((line) => line.trim() !== "");
+        for (const line of text) {
+          const message = line.replace(/^data: /, "");
+          if (message === "[DONE]") {
+            return; // Stream finished
+          }
+          try {
+            const parsed = JSON.parse(message);
+            if ("content" in parsed.choices[0].delta)
+              responseText += parsed.choices[0].delta?.content;
+          } catch (error) {
+            console.error(
+              "Could not JSON parse stream message",
+              message,
+              error,
+            );
+          }
+        }
+
+        console.log(responseText);
 
         const done = content.done;
         options?.onMessage(responseText, false);
