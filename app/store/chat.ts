@@ -9,6 +9,7 @@ import {
   ControllerPool,
   requestChatStream,
   requestImage,
+  requestWebSearch,
   requestWithPrompt,
 } from "../requests";
 import { trimTopic } from "../utils";
@@ -30,6 +31,7 @@ export type ChatMessage = RequestMessage & {
   isError?: boolean;
   id?: number;
   model?: ModelType;
+  webContent?: string;
 };
 
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
@@ -38,6 +40,7 @@ export function createMessage(override: Partial<ChatMessage>): ChatMessage {
     date: new Date().toLocaleString(),
     role: "user",
     content: "",
+    webContent: undefined,
     ...override,
   };
 }
@@ -102,7 +105,7 @@ interface ChatStore {
   deleteSession: (index: number) => void;
   currentSession: () => ChatSession;
   onNewMessage: (message: ChatMessage) => void;
-  onUserInput: (content: string) => Promise<void>;
+  onUserInput: (content: string, isWebSearch: boolean) => Promise<void>;
   summarizeSession: () => void;
   updateStat: (message: ChatMessage) => void;
   updateCurrentSession: (updater: (session: ChatSession) => void) => void;
@@ -249,7 +252,7 @@ export const useChatStore = create<ChatStore>()(
         get().summarizeSession();
       },
 
-      async onUserInput(content) {
+      async onUserInput(content, isWebSearch) {
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
         const imageModelConfig = session.mask.imageModelConfig;
@@ -286,6 +289,36 @@ export const useChatStore = create<ChatStore>()(
         // save user's and bot's message
         get().updateCurrentSession((session) => {
           session.messages.push(userMessage);
+        });
+        if (isWebSearch) {
+          const query = encodeURIComponent(content);
+          const body = await requestWebSearch(query);
+          const webSearchPrompt = `
+Using the provided web search results, write a comprehensive reply to the given query.
+If the provided search results refer to multiple subjects with the same name, write separate answers for each subject.
+Make sure to cite results using \`[[number](URL)]\` notation after the reference.
+
+Web search json results:
+"""
+${JSON.stringify(body)}
+"""
+
+Current date:
+"""
+${new Date().toISOString()}
+"""
+
+Query:
+"""
+${content}
+"""
+
+Reply in Chinese and markdown.
+          `;
+          userMessage.webContent = webSearchPrompt;
+        }
+        // save user's and bot's message
+        get().updateCurrentSession((session) => {
           session.messages.push(botMessage);
         });
 
