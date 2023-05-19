@@ -304,7 +304,9 @@ export async function requestChatStream(
             return; // Stream finished
           }
           try {
+            console.log(message);
             const parsed = JSON.parse(message);
+            console.log(parsed);
             if ("content" in parsed.choices[0].delta)
               responseText += parsed.choices[0].delta?.content;
           } catch (error) {
@@ -315,8 +317,6 @@ export async function requestChatStream(
             );
           }
         }
-
-        console.log(responseText);
 
         const done = content.done;
         options?.onMessage(responseText, false);
