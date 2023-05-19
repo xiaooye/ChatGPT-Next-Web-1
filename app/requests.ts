@@ -313,6 +313,7 @@ export async function requestChatStream(
             else
               try {
                 const parsed = JSON.parse(substr + message);
+                console.log(parsed);
                 substr = "";
                 if ("content" in parsed.choices[0].delta)
                   responseText += parsed.choices[0].delta?.content;
