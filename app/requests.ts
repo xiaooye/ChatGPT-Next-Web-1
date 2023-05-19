@@ -112,7 +112,7 @@ export async function requestWebSearch(query: string) {
   try {
     return await res.json();
   } catch (error) {
-    console.error("[Request Web Search] ", error, res.body);
+    //console.error("[Request Web Search] ", error, res.body);
   }
 }
 

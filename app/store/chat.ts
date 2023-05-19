@@ -315,7 +315,6 @@ ${content}
 
 Reply in Chinese and markdown.
           `;
-          console.log(webSearchPrompt);
           userMessage.webContent = webSearchPrompt;
         }
         // save user's and bot's message

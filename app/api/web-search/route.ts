@@ -10,7 +10,7 @@ async function makeRequest(req: NextRequest) {
     console.log(WEB_SEARCH_BASE_URL);
     const query = encodeURIComponent(content!);
     const api = await fetch(
-      `${WEB_SEARCH_BASE_URL}/search?q=${query}&max_results=3`,
+      `${WEB_SEARCH_BASE_URL}/search?q=${query}&max_results=5`,
     );
     const res = new NextResponse(api.body);
     res.headers.set("Content-Type", "application/json");
