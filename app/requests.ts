@@ -293,6 +293,8 @@ export async function requestChatStream(
           break;
         }
 
+        console.log(decoder.decode(content.value, { stream: true }).toString());
+
         const text = decoder
           .decode(content.value, { stream: true })
           .toString()
