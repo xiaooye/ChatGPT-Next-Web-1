@@ -271,7 +271,7 @@ export async function requestChatStream(
 
     clearTimeout(reqTimeoutId);
 
-    let responseText = "";
+    let responseText = "[";
 
     const finish = () => {
       options?.onMessage(responseText, true);
@@ -280,7 +280,7 @@ export async function requestChatStream(
 
     if (res.ok) {
       const reader = res.body?.getReader();
-      const decoder = new TextDecoder("utf-8");
+      const decoder = new TextDecoder();
 
       options?.onController?.(controller);
 
@@ -297,7 +297,6 @@ export async function requestChatStream(
 
         console.log(decoder.decode(content.value));
 
-        let startIndex = 0;
         const text = decoder
           .decode(content.value, { stream: true })
           .toString()
@@ -308,17 +307,7 @@ export async function requestChatStream(
           if (message === "[DONE]") {
             return; // Stream finished
           }
-          try {
-            const parsed = JSON.parse(message);
-            if ("content" in parsed.choices[0].delta)
-              responseText += parsed.choices[0].delta?.content;
-          } catch (error) {
-            console.error(
-              "Could not JSON parse stream message",
-              message,
-              error,
-            );
-          }
+          responseText += message;
         }
 
         const done = content.done;
@@ -328,6 +317,9 @@ export async function requestChatStream(
           break;
         }
       }
+
+      responseText += "]";
+      console.log(responseText);
 
       finish();
     } else if (res.status === 401) {
