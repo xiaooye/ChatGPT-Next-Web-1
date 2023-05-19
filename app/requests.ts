@@ -312,7 +312,7 @@ export async function requestChatStream(
           } catch (error) {
             console.log(substr, message);
             if (substr.length === 0) {
-              substr = message;
+              substr += message;
             } else {
               try {
                 const parsed = JSON.parse(substr + message);
