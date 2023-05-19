@@ -299,6 +299,7 @@ export async function requestChatStream(
           .split("\n")
           .filter((line) => line.trim() !== "");
         for (const line of text) {
+          console.log(line);
           const message = line.replace(/^data: /, "");
           if (message === "[DONE]") {
             return; // Stream finished
