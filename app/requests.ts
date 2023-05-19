@@ -324,7 +324,6 @@ export async function requestChatStream(
             if ("content" in parsed.choices[0].delta)
               responseText += parsed.choices[0].delta?.content;
           } catch (error) {
-            console.log(substr, message);
             if (substr === "") {
               substr = message;
             } else {
