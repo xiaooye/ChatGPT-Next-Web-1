@@ -279,6 +279,7 @@ export async function requestChatStream(
     };
 
     if (res.ok) {
+      console.log(res);
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
 
@@ -293,23 +294,20 @@ export async function requestChatStream(
           break;
         }
 
-        console.log(decoder.decode(content.value, { stream: true }).toString());
+        console.log(decoder.decode(content.value));
 
         const text = decoder
           .decode(content.value, { stream: true })
           .toString()
           .split("\n")
           .filter((line) => line.trim() !== "");
-        for (const line of text) {
-          console.log(line);
+        for (const [index, line] of text.entries()) {
           const message = line.replace(/^data: /, "");
           if (message === "[DONE]") {
             return; // Stream finished
           }
           try {
-            console.log(message);
             const parsed = JSON.parse(message);
-            console.log(parsed);
             if ("content" in parsed.choices[0].delta)
               responseText += parsed.choices[0].delta?.content;
           } catch (error) {
