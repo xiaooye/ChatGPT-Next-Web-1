@@ -313,7 +313,7 @@ Query:
 ${content}
 """
 
-Reply in Chinese and markdown.
+Reply in current language and markdown.
           `;
           userMessage.webContent = webSearchPrompt;
         }
