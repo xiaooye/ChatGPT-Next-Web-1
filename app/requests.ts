@@ -311,7 +311,7 @@ export async function requestChatStream(
               responseText += parsed.choices[0].delta?.content;
           } catch (error) {
             console.log(substr, message);
-            if (substr.length === 0) {
+            if (substr === "") {
               substr += message;
             } else {
               try {
