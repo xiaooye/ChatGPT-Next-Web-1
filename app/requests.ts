@@ -305,12 +305,15 @@ export async function requestChatStream(
             return; // Stream finished
           }
           try {
+            console.log(message);
             const parsed = JSON.parse(message);
             if ("content" in parsed.choices[0].delta)
               responseText += parsed.choices[0].delta?.content;
           } catch (error) {
-            if (substr.length === 0) substr = message;
-            else
+            console.log(substr, message);
+            if (substr.length === 0) {
+              substr = message;
+            } else {
               try {
                 const parsed = JSON.parse(substr + message);
                 console.log(parsed);
@@ -325,6 +328,7 @@ export async function requestChatStream(
                 );
                 substr += message;
               }
+            }
           }
         }
 
