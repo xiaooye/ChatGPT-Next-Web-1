@@ -271,7 +271,7 @@ export async function requestChatStream(
 
     clearTimeout(reqTimeoutId);
 
-    let responseText = "[";
+    let responseText = "";
 
     const finish = () => {
       options?.onMessage(responseText, true);
@@ -293,21 +293,38 @@ export async function requestChatStream(
           break;
         }
 
-        console.log(content);
-
-        console.log(decoder.decode(content.value));
-
         const text = decoder
           .decode(content.value, { stream: true })
           .toString()
           .split("\n")
           .filter((line) => line.trim() !== "");
+        let substr = "";
         for (const line of text) {
           const message = line.replace(/^data: /, "");
           if (message === "[DONE]") {
             return; // Stream finished
           }
-          responseText += message;
+          try {
+            const parsed = JSON.parse(message);
+            if ("content" in parsed.choices[0].delta)
+              responseText += parsed.choices[0].delta?.content;
+          } catch (error) {
+            if (substr.length === 0) substr = message;
+            else
+              try {
+                const parsed = JSON.parse(substr + message);
+                substr = "";
+                if ("content" in parsed.choices[0].delta)
+                  responseText += parsed.choices[0].delta?.content;
+              } catch (error) {
+                console.error(
+                  "Could not JSON parse stream message",
+                  message,
+                  error,
+                );
+                substr += message;
+              }
+          }
         }
 
         const done = content.done;
@@ -317,9 +334,6 @@ export async function requestChatStream(
           break;
         }
       }
-
-      responseText += "]";
-      console.log(responseText);
 
       finish();
     } else if (res.status === 401) {
