@@ -283,7 +283,7 @@ export async function requestChatStream(
       const decoder = new TextDecoder();
 
       options?.onController?.(controller);
-
+      let substr = "";
       while (true) {
         const resTimeoutId = setTimeout(() => finish(), TIME_OUT_MS);
         const content = await reader?.read();
@@ -298,6 +298,7 @@ export async function requestChatStream(
           .toString()
           .split("\n")
           .filter((line) => line.trim() !== "");
+
         for (const line of text) {
           const message = line.replace(/^data: /, "");
           if (message === "[DONE]") {
@@ -308,15 +309,25 @@ export async function requestChatStream(
             if ("content" in parsed.choices[0].delta)
               responseText += parsed.choices[0].delta?.content;
           } catch (error) {
-            console.error(
-              "Could not JSON parse stream message",
-              message,
-              error,
-            );
+            if (substr === "") {
+              substr = message;
+            } else {
+              try {
+                const parsed = JSON.parse(substr + message);
+                substr = "";
+                if ("content" in parsed.choices[0].delta)
+                  responseText += parsed.choices[0].delta?.content;
+              } catch (error) {
+                console.error(
+                  "Could not JSON parse stream message",
+                  message,
+                  error,
+                );
+                substr += message;
+              }
+            }
           }
         }
-
-        console.log(responseText);
 
         const done = content.done;
         options?.onMessage(responseText, false);
