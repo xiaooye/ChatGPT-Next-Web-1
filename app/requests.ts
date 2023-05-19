@@ -237,6 +237,39 @@ export async function requestImage(
   }
 }
 
+export async function* makeTextFileLineIterator(
+  resBody: ReadableStream<Uint8Array>,
+) {
+  const utf8Decoder = new TextDecoder("utf-8");
+  let reader = resBody.getReader();
+  let { value: chunk, done: readerDone } = await reader.read();
+  chunk = chunk ? utf8Decoder.decode(chunk, { stream: true }) : "";
+
+  let re = /\r\n|\n|\r/gm;
+  let startIndex = 0;
+
+  for (;;) {
+    let result = re.exec(chunk);
+    if (!result) {
+      if (readerDone) {
+        break;
+      }
+      let remainder = chunk.substr(startIndex);
+      ({ value: chunk, done: readerDone } = await reader.read());
+      chunk =
+        remainder + (chunk ? utf8Decoder.decode(chunk, { stream: true }) : "");
+      startIndex = re.lastIndex = 0;
+      continue;
+    }
+    yield chunk.substring(startIndex, result.index);
+    startIndex = re.lastIndex;
+  }
+  if (startIndex < chunk.length) {
+    // last line didn't end in a newline char
+    yield chunk.substr(startIndex);
+  }
+}
+
 export async function requestChatStream(
   messages: ChatMessage[],
   options?: {
@@ -279,53 +312,10 @@ export async function requestChatStream(
     };
 
     if (res.ok) {
-      console.log(res);
-      const reader = res.body?.getReader();
-      const decoder = new TextDecoder();
-
-      options?.onController?.(controller);
-
-      while (true) {
-        const resTimeoutId = setTimeout(() => finish(), TIME_OUT_MS);
-        const content = await reader?.read();
-        clearTimeout(resTimeoutId);
-
-        if (!content || !content.value) {
-          break;
+      if (res.body)
+        for await (let line of makeTextFileLineIterator(res.body)) {
+          console.log(line);
         }
-
-        console.log(decoder.decode(content.value));
-
-        const text = decoder
-          .decode(content.value, { stream: true })
-          .toString()
-          .split("\n")
-          .filter((line) => line.trim() !== "");
-        for (const [index, line] of text.entries()) {
-          const message = line.replace(/^data: /, "");
-          if (message === "[DONE]") {
-            return; // Stream finished
-          }
-          try {
-            const parsed = JSON.parse(message);
-            if ("content" in parsed.choices[0].delta)
-              responseText += parsed.choices[0].delta?.content;
-          } catch (error) {
-            console.error(
-              "Could not JSON parse stream message",
-              message,
-              error,
-            );
-          }
-        }
-
-        const done = content.done;
-        options?.onMessage(responseText, false);
-
-        if (done) {
-          break;
-        }
-      }
 
       finish();
     } else if (res.status === 401) {
