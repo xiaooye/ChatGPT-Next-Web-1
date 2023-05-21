@@ -18,7 +18,7 @@ import Locale from "../locales";
 import { showToast } from "../components/ui-lib";
 import { ModelType } from "./config";
 import { createEmptyMask, Mask } from "./mask";
-import { REQUEST_TIMEOUT_MS, StoreKey } from "../constant";
+import { StoreKey } from "../constant";
 import { api, RequestMessage } from "../client/api";
 import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
@@ -53,7 +53,6 @@ export interface ChatStat {
 
 export interface ChatSession {
   id: number;
-
   topic: string;
 
   memoryPrompt: string;
@@ -62,6 +61,8 @@ export interface ChatSession {
   lastUpdate: number;
   lastSummarizeIndex: number;
   botHello: ChatMessage;
+  clearContextIndex?: number;
+
   mask: Mask;
 }
 
@@ -89,8 +90,8 @@ function createEmptySession(): ChatSession {
     },
     lastUpdate: Date.now(),
     lastSummarizeIndex: 0,
-    mask: mask,
     botHello: createBotHelloWithCommand(mask.imageModelConfig.command),
+    mask: createEmptyMask(),
   };
 }
 
@@ -350,13 +351,14 @@ Reply in current language and markdown.
                 set(() => ({}));
               }
             },
-            onError(error, statusCode) {
+            onError(error) {
               const isAborted = error.message.includes("aborted");
-              if (statusCode === 401) {
-                botMessage.content = Locale.Error.Unauthorized;
-              } else if (!isAborted) {
-                botMessage.content += "\n\n" + Locale.Store.Error;
-              }
+              botMessage.content =
+                "\n\n" +
+                prettyObject({
+                  error: true,
+                  message: error.message,
+                });
               botMessage.streaming = false;
               userMessage.isError = !isAborted;
               botMessage.isError = !isAborted;
@@ -441,7 +443,12 @@ Reply in current language and markdown.
       getMessagesWithMemory() {
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
-        const messages = session.messages.filter((msg) => !msg.isError);
+
+        // wont send cleared context messages
+        const clearedContextMessages = session.messages.slice(
+          (session.clearContextIndex ?? -1) + 1,
+        );
+        const messages = clearedContextMessages.filter((msg) => !msg.isError);
         const n = messages.length;
 
         const context = session.mask.context.slice();
@@ -462,17 +469,17 @@ Reply in current language and markdown.
           n - modelConfig.historyMessageCount,
         );
         const longTermMemoryMessageIndex = session.lastSummarizeIndex;
-        const oldestIndex = Math.max(
+        const mostRecentIndex = Math.max(
           shortTermMemoryMessageIndex,
           longTermMemoryMessageIndex,
         );
-        const threshold = modelConfig.compressMessageLengthThreshold;
+        const threshold = modelConfig.compressMessageLengthThreshold * 2;
 
         // get recent messages as many as possible
         const reversedRecentMessages = [];
         for (
           let i = n - 1, count = 0;
-          i >= oldestIndex && count < threshold;
+          i >= mostRecentIndex && count < threshold;
           i -= 1
         ) {
           const msg = messages[i];
@@ -510,15 +517,15 @@ Reply in current language and markdown.
         const session = get().currentSession();
 
         // remove error messages if any
-        const cleanMessages = session.messages.filter((msg) => !msg.isError);
+        const messages = session.messages;
 
         // should summarize topic after chating more than 50 words
         const SUMMARIZE_MIN_LEN = 50;
         if (
           session.topic === DEFAULT_TOPIC &&
-          countMessages(cleanMessages) >= SUMMARIZE_MIN_LEN
+          countMessages(messages) >= SUMMARIZE_MIN_LEN
         ) {
-          const topicMessages = cleanMessages.concat(
+          const topicMessages = messages.concat(
             createMessage({
               role: "user",
               content: Locale.Store.Prompt.Topic,
@@ -540,9 +547,13 @@ Reply in current language and markdown.
         }
 
         const modelConfig = session.mask.modelConfig;
-        let toBeSummarizedMsgs = cleanMessages.slice(
+        const summarizeIndex = Math.max(
           session.lastSummarizeIndex,
+          session.clearContextIndex ?? 0,
         );
+        let toBeSummarizedMsgs = messages
+          .filter((msg) => !msg.isError)
+          .slice(summarizeIndex);
 
         const historyMsgLength = countMessages(toBeSummarizedMsgs);
 
@@ -567,7 +578,7 @@ Reply in current language and markdown.
 
         if (
           historyMsgLength > modelConfig.compressMessageLengthThreshold &&
-          session.mask.modelConfig.sendMemory
+          modelConfig.sendMemory
         ) {
           api.llm.chat({
             messages: toBeSummarizedMsgs.concat({
