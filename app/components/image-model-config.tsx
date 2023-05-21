@@ -8,7 +8,7 @@ import {
 
 import Locale from "../locales";
 import { InputRange } from "./input-range";
-import { Input, List, ListItem, Select } from "./ui-lib";
+import { Input, List, ListItem, Select, PasswordInput } from "./ui-lib";
 import { ImageRequestSizeEnum } from "../api/openai/typing";
 import { CreateImageRequestSizeEnum } from "openai";
 
@@ -22,7 +22,7 @@ export function ImageModelConfigList(props: {
         <input value={Locale.Settings.ImageModel.Model} disabled={true} />
       </ListItem>
       <ListItem title={Locale.Settings.ImageModel.Command}>
-        <input
+        <PasswordInput
           value={props.imageModelConfig.command}
           onChange={(e) => {
             props.updateConfig((config) => {
