@@ -1,4 +1,5 @@
 name: Dependabot auto-approve
+
 on: pull_request
 
 permissions:
@@ -14,6 +15,7 @@ jobs:
         uses: dependabot/fetch-metadata@v1
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
+          
       - name: Approve a PR
         run: gh pr review --approve "$PR_URL"
         env:
