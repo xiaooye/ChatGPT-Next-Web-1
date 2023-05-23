@@ -27,7 +27,7 @@ const cn = {
       if (submitKey === String(SubmitKey.Enter)) {
         inputHints += "，Shift + Enter 换行";
       }
-      return inputHints + "，/ 触发补全";
+      return inputHints + "，/ 触发补全， 点击输入框上方浏览器按钮开启搜索功能";
     },
     Send: "发送",
     Config: {

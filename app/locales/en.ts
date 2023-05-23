@@ -28,7 +28,10 @@ const en: RequiredLocaleType = {
       if (submitKey === String(SubmitKey.Enter)) {
         inputHints += ", Shift + Enter to wrap";
       }
-      return inputHints + ", / to search prompts";
+      return (
+        inputHints +
+        ", / to search prompts, click the browser button above the input box to enable search function"
+      );
     },
     Send: "Send",
     Config: {
