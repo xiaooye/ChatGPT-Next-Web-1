@@ -17,6 +17,7 @@ import { trimTopic } from "../utils";
 import Locale from "../locales";
 import { showToast } from "../components/ui-lib";
 import { ModelType } from "./config";
+import { getLang, Lang } from "../locales";
 import { createEmptyMask, Mask } from "./mask";
 import { StoreKey } from "../constant";
 import { api, RequestMessage } from "../client/api";
@@ -299,14 +300,20 @@ export const useChatStore = create<ChatStore>()(
         if (isWebSearch) {
           const query = encodeURIComponent(content);
           const body = await requestWebSearch(query);
-          const webSearchPrompt = `
+          const formattedbody = body["items"].map((item) => {
+            return {
+              title: item["title"],
+              link: item["formattedUrl"],
+              snippet: item["snippet"],
+            };
+          });
+          const webSearchPrompt = await `
 Using the provided web search results, write a comprehensive reply to the given query.
-If the provided search results refer to multiple subjects with the same name, write separate answers for each subject.
 Make sure to cite results using \`[[number](URL)]\` notation after the reference.
 
 Web search json results:
 """
-${JSON.stringify(body)}
+${JSON.stringify(formattedbody)}
 """
 
 Current date:
@@ -319,7 +326,11 @@ Query:
 ${content}
 """
 
-Reply in current language and markdown.
+Reply in 
+"""
+${getLang()}
+and markdown.
+"""
           `;
           userMessage.webContent = webSearchPrompt;
         }
