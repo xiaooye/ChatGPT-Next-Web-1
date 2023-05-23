@@ -14,6 +14,7 @@ import {
 } from "../requests";
 import { trimTopic } from "../utils";
 
+import { SearchResult } from "../client/api";
 import Locale from "../locales";
 import { showToast } from "../components/ui-lib";
 import { ModelType } from "./config";
@@ -300,7 +301,7 @@ export const useChatStore = create<ChatStore>()(
         if (isWebSearch) {
           const query = encodeURIComponent(content);
           const body = await requestWebSearch(query);
-          const formattedbody = body["items"].map((item) => {
+          const formattedbody = body["items"].map((item: SearchResult) => {
             return {
               title: item["title"],
               link: item["formattedUrl"],

@@ -13,6 +13,11 @@ export interface RequestMessage {
   content: string;
 }
 
+export interface SearchResult {
+  title: string;
+  formattedurl: string;
+  snippet: string;
+}
 export interface LLMConfig {
   model: string;
   temperature?: number;
