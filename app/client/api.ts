@@ -15,7 +15,7 @@ export interface RequestMessage {
 
 export interface SearchResult {
   title: string;
-  formattedurl: string;
+  formattedUrl: string;
   snippet: string;
 }
 export interface LLMConfig {
